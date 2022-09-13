@@ -1,3 +1,4 @@
+
 # Read `man 5 sway` for a complete reference.
 
 ### Variables
@@ -31,7 +32,7 @@ set $right l
 set $ws1 "1 "
 set $ws2 "2 "
 set $ws3 "3 "
-set $ws4 "4 "
+set $ws4 "4 "
 set $ws5 "5 "
 set $ws6 "6 "
 set $ws7 "7 "
@@ -50,14 +51,11 @@ client.focused	$br     $br     $textColor	$brbug		$br
 #output configurations
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 
-
-#xdg-desktop-portal-wlr for screen sharing
-exec --no-startup-id dbus-update-activation-environment --all
-
 #output eDP-1 scale 1.25
 #output eDP-1 mode 2560x1440@165.003Hz position 0,0 adaptive_sync on
 output DP-2 mode 2560x1440 position 0,0 adaptive_sync on
-#output HDMI-A-1 res 2560x1440 position 0,0 
+#output HDMI-A-1 mode 2560x1440 position 0,0 adaptive_sync on 
+output HDMI-A-1 mode 2560x1440 pos 0,0 adaptive_sync on
 
 #wallpaper
 #output * bg /home/ja/Pictures/wallpaper/emerge.png fill
@@ -240,9 +238,15 @@ bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
 # Bind media keys on a keyboard to control volume and playback
+#bindsym XF86AudioRaiseVolume exec /home/ja/sway_bin/pipewire-volume.sh+1
+#bindsym XF86AudioLowerVolume exec /home/ja/sway_bin/pipewire-volume.sh-1
+#bindsym XF86AudioMute exec /home/ja/sway_bin/pipewire-volume.shm
+#bindsym XF86AudioMicMute exec /home/ja/sway_bin/pipewire-volume.shm
+
 bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +2%
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -2%
 bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym Control+XF86AudioMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
 
 bindsym XF86AudioPlay exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
@@ -319,13 +323,17 @@ bar {
 
 
 assign [app_id="firefox"] → $ws2
+assign [app_id="microsoft-edge-stable"] → $ws2
+assign [class="microsoft-edge-stable"] → $ws2
 assign [app_id="dolphin"] → $ws3
 assign [app_id="thunar"] → $ws3
 assign [app_id="obs"] → $ws4
+assign [app_id="steam"] → $ws5
 assign [class="steam"] → $ws5
 assign [app_id="lutris"] → $ws5
 assign [app_id="virt-manager"] → $ws6
 assign [app_id="audacious"] → $ws9
+assign [app_id="deadbeef"] → $ws9
 assign [app_id="easyeffects"] → $ws9
 
 
@@ -335,27 +343,35 @@ assign [app_id="easyeffects"] → $ws9
 #  / ___ \ |_| | | || |_| |___) || |/ ___ \|  _ < | |  
 # /_/   \_\___/  |_| \___/|____/ |_/_/   \_\_| \_\|_|  
 #
-xwayland enable
+
+#xdg-desktop-portal-wlr for screen sharing
+exec --no-startup-id dbus-update-activation-environment --all
+
 #polkit
-exec_always /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec /usr/libexec/polkit-gnome-authentication-agent-1
 
 exec mako
 
 exec easyeffects 
 #--gapplication-service
 #exec easyeffects -r
-exec easyeffects -l own
+exec easyeffects -l my_own
+
 
 #autotiling
-exec autotiling
+#exec_always --nostartup-id autotiling
+#exec autotiling
+exec /usr/bin/autotiling
 
 #pipewire
 exec gentoo-pipewire-launcher
+exec --nostartup-id /usr/libexec/xdg-desktop-portal-wlr -r
+
+
+exec dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
 include colorscheme 
+xwayland enable
 
-exec thunar --daemon
-
-exec twm
 
 #include /etc/sway/config
